@@ -1167,6 +1167,58 @@ vector <sUser> LoadUsersDataFromFile(string FileName)
     return vUsers;
 }
 
+sUser ChangeUserRecord(string UserName)
+{
+    sUser User;
+
+    User.UserName = UserName;
+
+    cout << "\n\nEnter Password? ";
+    getline(cin >> ws, User.Password);
+
+    User.Permissions = ReadPermissionsToSet();
+
+    return User;
+}
+
+bool UpdateUserByUserName(string UserName, vector <sUser>& vUsers)
+{
+    sUser User;
+    char Answer = 'n';
+
+    if (FindUserByUserName(UserName, vUsers, User))
+    {
+
+        PrintUserCard(User);
+        cout << "\n\nAre you sure you want update this User? y/n ? ";
+        cin >> Answer;
+        if (Answer == 'y' || Answer == 'Y')
+        {
+
+            for (sUser& U : vUsers)
+            {
+                if (U.UserName == UserName)
+                {
+                    U = ChangeUserRecord(UserName);
+                    break;
+                }
+
+            }
+
+            SaveUsersDataToFile(UsersFileName, vUsers);
+
+            cout << "\n\nUser Updated Successfully.";
+            return true;
+        }
+
+    }
+    else
+    {
+        cout << "\nUser with UserName (" << UserName << ") is Not Found!";
+        return false;
+    }
+}
+
 bool DeleteUserByAccountUserName(string UserName, vector <sUser> vUsers)
 {
     if (UserName == "Admin")
@@ -1217,12 +1269,28 @@ void ShowDeleteUserScreen()
 
 void ShowUpdateUserScreen()
 {
+    cout << "\n-----------------------------------\n";
+    cout << "\tUpdate User Info Screen";
+    cout << "\n-----------------------------------\n";
 
+    vector <sUser> vUsers = LoadUsersDataFromFile(UsersFileName);
+    string UserName = ReadUserUserName();
+    UpdateUserByUserName(UserName, vUsers);
 }
 
 void ShowFindUserScreen()
 {
+    cout << "\n-----------------------------------\n";
+    cout << "\tFind User Screen";
+    cout << "\n-----------------------------------\n";
 
+    vector <sUser> vUsers = LoadUsersDataFromFile(UsersFileName);
+    sUser User;
+    string UserName = ReadUserUserName();
+    if (FindUserByUserName(UserName, vUsers, User))
+        PrintUserCard(User);
+    else
+        cout << "\nUser with UserName[" << UserName << "] is not found!";
 }
 
 short ReadManageUserseOption()
